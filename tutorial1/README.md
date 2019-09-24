@@ -6,6 +6,8 @@ This tutorial assumes basic knowledge of C programming.
 
 ![Basic Format of a Make target and rules (Source: https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)](media/make_format.jpg)
 
+_Basic Format of a Make target and rules (Source: https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)_
+
 1. Create a file called `Makefile` using your text editor of choice. 
 
 _Makefiles can also use the lowercase 'makefile', but this is more unconventional._
