@@ -21,7 +21,7 @@ _The first Make rule is called when `$ make` is called in the current directory.
 
 _The body of the Make rule **MUST** be indented. For most C compilers, they will require the linker flags be last in the parameter list._
 
-5. Create a special Make target called `.PHONY`. This target specifies that any prerequisites are phony targets (they do not create an output file). The prerequisite is called `clean`.
+5. Create a special Make target called `.PHONY`. The format for this is the same as a Make rule. This target specifies that any prerequisites are phony targets (they do not create an output file). The prerequisite is called `clean`.
 
 6. Create a Make rule called `clean`. This rule does not require any prerequisites. The body of this rule (and any other Make rules) can execute arbitrary bash commands. This rule will delete a file called `PROGRAM_NAME`. The linux command for removing commands is `$ rm`.
 
