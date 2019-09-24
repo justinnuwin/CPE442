@@ -26,3 +26,5 @@ _The body of the Make rule **MUST** be indented. For most C compilers, they will
 7. Now that your Makefile template is complete for making a single target, fill in the variable names with the correct names. CC will usually be `gcc` or `clang`. Reccomended CFLAGS are `-Wall -Werror -g`. 
 
 8. Run `$ make` from the command line and see if your program made successfully!
+
+9. For the future, you can create additional Make rules andd variables to allow you to make multiple targets.
