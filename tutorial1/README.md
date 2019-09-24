@@ -1,12 +1,12 @@
 # Tutorial 1: Compiling with Make and GCC
 
-Justin Nguyen
+Justin Nguyen 09/24/2019
 
 This tutorial assumes basic knowledge of C programming.
 
 ![Basic Format of a Make target and rules (Source: https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)](media/make_format.jpg)
 
-_Basic Format of a Make target and rules (Source: https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)_
+_Basic Format of a Make target and rules [Source](https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)_
 
 1. Create a file called `Makefile` using your text editor of choice. 
 
