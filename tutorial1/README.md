@@ -4,6 +4,8 @@ Justin Nguyen
 
 This tutorial assumes basic knowledge of C programming.
 
+![Basic Format of a Make target and rules (Source: https://www.codeproject.com/Articles/31488/Makefiles-in-Linux-An-Overview)](media/make_format.jpg)
+
 1. Create a file called `Makefile` using your text editor of choice. 
 
 _Makefiles can also use the lowercase 'makefile', but this is more unconventional._
@@ -12,14 +14,14 @@ _Makefiles can also use the lowercase 'makefile', but this is more unconventiona
 
 _Variables in Make **CAN NOT** have spaces around the assignment operator (the `=` sign) nor a preceeding indent._
 
-3. Declare a Make rule called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. Make rules are unindented and are a name followed by a colon like so: `all:`. All variables must be referenced like so: `$(VARIABLE_NAME)`. The rule for all should look like: `all: $(VARIABLE_NAME)`. Multiple prerequisites can be listed separated by a space. 
+3. Make targets are unindented and are a name followed by a colon like so: `target:`. All variables must be referenced like so: `$(VARIABLE_NAME)`. The target for all should look like: `all: $(DEPENDANCY_1) $(DEPENDANCY_2)`. Multiple prerequisites (also called dependencies) can be listed separated by a space. Declare a Make target called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. The target for this rule should look like the following: `all: $(C_HEADERS) $(C_SOURCES)`.
 
 _Placing names in the prerequisites list for a Make rule will cause Make to look if the file has changed, (or the respective Make rule output) has been created before running this rule._
 _The first Make rule is called when `$ make` is called in the current directory. Since the rule is named 'all', `$ make all` will also run this rule._
 
-4. Fill the body of the Make rule with the command to compile a C program. The usual format for C compiler commands are `COMPILER_PROGRAM -o PROGRAM_NAME COMPILER_FLAGS C_SOURCES LINKER_FLAGS` Write the Make rule utilizing the proper variables we created in step 2.
+4. Fill the body of the Make target with rules, or commands to complete this target. In this case we will be compiling a C program. The usual format for C compiler commands are `COMPILER_PROGRAM -o PROGRAM_NAME COMPILER_FLAGS C_SOURCES LINKER_FLAGS`. Write the Make rule following this format and utilizing the variables we created in step 2. Remember that you must reference variables using the `$(VARIABLE_NAME)` format. Keep in mind that `COMPILER PROGRAM` is the `CC` variable and `LINKER_FLAGS` is the `LDFLAGS` variable.
 
-_The body of the Make rule **MUST** be indented. For most C compilers, they will require the linker flags be last in the parameter list._
+_The Make rules **MUST** be indented. For most C compilers, they will require the linker flags be last in the parameter list._
 
 5. Create a special Make target called `.PHONY`. The format for this is the same as a Make rule. This target specifies that any prerequisites are phony targets (they do not create an output file). The prerequisite is called `clean`. This rule will not have a body.
 
