@@ -12,7 +12,7 @@ _Makefiles can also use the lowercase 'makefile', but this is more unconventiona
 
 _Variables in Make **CAN NOT** have spaces around the assignment operator (the `=` sign) nor a preceeding indent._
 
-3. Declare a Make rule called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. Make rules are unindented and are a name followed by a colon like so: `all:`. You can reference variables like so: `$(VARIABLE_NAME)`. The rule for all should look like: `all: $(VARIABLE_NAME)`.
+3. Declare a Make rule called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. Make rules are unindented and are a name followed by a colon like so: `all:`. All variables must be referenced like so: `$(VARIABLE_NAME)`. The rule for all should look like: `all: $(VARIABLE_NAME)`. Multiple prerequisites can be listed separated by a space. 
 
 _Placing names in the prerequisites list for a Make rule will cause Make to look if the file has changed, (or the respective Make rule output) has been created before running this rule._
 _The first Make rule is called when `$ make` is called in the current directory. Since the rule is named 'all', `$ make all` will also run this rule._
@@ -21,7 +21,7 @@ _The first Make rule is called when `$ make` is called in the current directory.
 
 _The body of the Make rule **MUST** be indented. For most C compilers, they will require the linker flags be last in the parameter list._
 
-5. Create a special Make target called `.PHONY`. The format for this is the same as a Make rule. This target specifies that any prerequisites are phony targets (they do not create an output file). The prerequisite is called `clean`.
+5. Create a special Make target called `.PHONY`. The format for this is the same as a Make rule. This target specifies that any prerequisites are phony targets (they do not create an output file). The prerequisite is called `clean`. This rule will not have a body.
 
 6. Create a Make rule called `clean`. This rule does not require any prerequisites. The body of this rule (and any other Make rules) can execute arbitrary bash commands. This rule will delete a file called `PROGRAM_NAME`. The linux command for removing commands is `$ rm`.
 
