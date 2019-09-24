@@ -1,5 +1,7 @@
 # Tutorial 1: Compiling with Make and GCC
 
+Justin Nguyen
+
 This tutorial assumes basic knowledge of C programming.
 
 1. Create a file called `Makefile` using your text editor of choice. 
@@ -10,7 +12,7 @@ _Makefiles can also use the lowercase 'makefile', but this is more unconventiona
 
 _Variables in Make **CAN NOT** have spaces around the assignment operator (the `=` sign) nor a preceeding indent._
 
-3. Declare a Make rule called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. Make rules are unindented and are a name followed by a colon like so: `all:`. You can reference variables like so: `$(VARIABLE_NAME)`.
+3. Declare a Make rule called `all`. Place `C_HEADERS, and C_SOURCES` as the prerequisites. Make rules are unindented and are a name followed by a colon like so: `all:`. You can reference variables like so: `$(VARIABLE_NAME)`. The rule for all should look like: `all: $(VARIABLE_NAME)`.
 
 _Placing names in the prerequisites list for a Make rule will cause Make to look if the file has changed, (or the respective Make rule output) has been created before running this rule._
 _The first Make rule is called when `$ make` is called in the current directory. Since the rule is named 'all', `$ make all` will also run this rule._
