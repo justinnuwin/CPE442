@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 
 #include "grayscale.hpp"
+#include "sobel.hpp"
 
 using namespace std;
 using namespace cv;
@@ -18,16 +19,23 @@ int main(int argc, char *argv[]) {
     cap.read(test);
 
     while (true) {
-        Mat frame, grayscale;
+        Mat frame, grayscale, edges;
         cap.read(frame);
         
         if (frame.empty())
             break;
 
         toGrayscale(frame, grayscale);
+        sobel(grayscale, edges);
 
-        imshow("Video", frame);
-        imshow("Video Grayscale", grayscale);
+        Mat example = imread("sobel_example.png", IMREAD_GRAYSCALE);
+        Mat sobelExample;
+        sobel(example, sobelExample);
+        imshow("Example", sobelExample);
+
+        // imshow("Video", frame);
+        // imshow("Video Grayscale", grayscale);
+        imshow("Video Edges", edges);
         waitKey(1);
     }
 

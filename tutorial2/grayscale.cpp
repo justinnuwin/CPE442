@@ -24,17 +24,16 @@ void toGrayscale(Mat &input, Mat &output) {
     int channels = input.channels();
     int nRows = input.rows;
     int nCols = input.cols;
-    output.create(nRows, nCols, CV_8UC1);   // TODO: input.size() would work better check if it is row, width, channel or not
+    output.create(nRows, nCols, CV_8UC1);
 
     if (input.isContinuous() && output.isContinuous()) {
         nCols *= nRows;
         nRows = 1;
     }
 
-    uchar *inputRow_p, *outputRow_p;
     for(int i = 0; i < nRows; i++) {
-        inputRow_p = input.ptr<uchar>(i);
-        outputRow_p = output.ptr<uchar>(i);
+        uchar *inputRow_p = input.ptr<uchar>(i);
+        uchar *outputRow_p = output.ptr<uchar>(i);
         for (int j = 0; j < nCols; j++) {
             outputRow_p[j] = computeGamma(&(inputRow_p[j * channels]));
         }
