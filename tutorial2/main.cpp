@@ -5,18 +5,14 @@
 #include "grayscale.hpp"
 #include "sobel.hpp"
 
-using namespace std;
 using namespace cv;
 
 #define CAMERAINDEX 0
 
 int main(int argc, char *argv[]) {
-
     VideoCapture cap(0);
     if (!cap.isOpened())
         return -1;
-    Mat test;
-    cap.read(test);
 
     while (true) {
         Mat frame, grayscale, edges;
@@ -33,5 +29,4 @@ int main(int argc, char *argv[]) {
         imshow("Video Edges", edges);
         waitKey(1);
     }
-
 }
