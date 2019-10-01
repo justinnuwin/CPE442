@@ -14,11 +14,8 @@ inline uchar computeGamma(const uchar* bgrPixel) {
 }
 
 
-// Based off of: https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-efficient-way
 void toGrayscale(Mat &input, Mat &output) {
     /* Converts to grayscale following CCIR 601 */
-
-    // accept only char type matrices
     CV_Assert(input.type() == CV_8UC3);
 
     int channels = input.channels();

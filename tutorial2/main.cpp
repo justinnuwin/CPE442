@@ -28,11 +28,6 @@ int main(int argc, char *argv[]) {
         toGrayscale(frame, grayscale);
         sobel(grayscale, edges);
 
-        Mat example = imread("sobel_example.png", IMREAD_GRAYSCALE);
-        Mat sobelExample;
-        sobel(example, sobelExample);
-        imshow("Example", sobelExample);
-
         // imshow("Video", frame);
         // imshow("Video Grayscale", grayscale);
         imshow("Video Edges", edges);

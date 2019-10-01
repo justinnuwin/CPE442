@@ -4,18 +4,15 @@
 using namespace cv;
 using namespace std;
 
-int vKernel[3][3] = {{-1, 0, 1},
-                     {-2, 0, 2},
-                     {-1, 0, 1}};
+const int vKernel[3][3] = {{-1, 0, 1},
+                           {-2, 0, 2},
+                           {-1, 0, 1}};
 
-int hKernel[3][3] = {{-1, -2, -1},
-                     { 0,  0,  0},
-                     { 1,  2, 1}};
+const int hKernel[3][3] = {{-1, -2, -1},
+                           { 0,  0,  0},
+                           { 1,  2,  1}};
 
-
-// Based off of: https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#the-efficient-way
 void sobel(Mat &input, Mat &output) {
-    // accept only char type matrices
     CV_Assert(input.type() == CV_8UC1);
 
     int nRows = input.rows;
@@ -28,25 +25,26 @@ void sobel(Mat &input, Mat &output) {
         uchar *inputRowP1_p = input.ptr<uchar>(i + 1);
         uchar *outputRow_p = output.ptr<uchar>(i - 1);
         for (int j = 1; j < nCols - 1; j++) {
-            uchar vGradient = inputRowM1_p[j - 1] * vKernel[0][0] +
-                              inputRowM1_p[j    ] * vKernel[0][1] +
-                              inputRowM1_p[j + 1] * vKernel[0][2] +
-                               inputRow0_p[j - 1] * vKernel[1][0] +
-                               inputRow0_p[j    ] * vKernel[1][1] +
-                               inputRow0_p[j + 1] * vKernel[1][2] +
-                              inputRowP1_p[j - 1] * vKernel[2][0] +
-                              inputRowP1_p[j    ] * vKernel[2][1] +
-                              inputRowP1_p[j + 1] * vKernel[2][2];
-            uchar hGradient = inputRowM1_p[j - 1] * hKernel[0][0] +
-                              inputRowM1_p[j    ] * hKernel[0][1] +
-                              inputRowM1_p[j + 1] * hKernel[0][2] +
-                               inputRow0_p[j - 1] * hKernel[1][0] +
-                               inputRow0_p[j    ] * hKernel[1][1] +
-                               inputRow0_p[j + 1] * hKernel[1][2] +
-                              inputRowP1_p[j - 1] * hKernel[2][0] +
-                              inputRowP1_p[j    ] * hKernel[2][1] +
-                              inputRowP1_p[j + 1] * hKernel[2][2];
-            outputRow_p[j - 1] = (uchar)round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
+            int vGradient = inputRowM1_p[j - 1] * vKernel[0][0] +
+                            // inputRowM1_p[j    ] * vKernel[0][1] +
+                            inputRowM1_p[j + 1] * vKernel[0][2] +
+                            inputRow0_p[j - 1] * vKernel[1][0] +
+                            // inputRow0_p[j    ] * vKernel[1][1] +
+                            inputRow0_p[j + 1] * vKernel[1][2] +
+                            inputRowP1_p[j - 1] * vKernel[2][0] +
+                            // inputRowP1_p[j    ] * vKernel[2][1] +
+                            inputRowP1_p[j + 1] * vKernel[2][2];
+            int hGradient = inputRowM1_p[j - 1] * hKernel[0][0] +
+                            inputRowM1_p[j    ] * hKernel[0][1] +
+                            inputRowM1_p[j + 1] * hKernel[0][2] +
+                            // inputRow0_p[j - 1] * hKernel[1][0] +
+                            // inputRow0_p[j    ] * hKernel[1][1] +
+                            // inputRow0_p[j + 1] * hKernel[1][2] +
+                            inputRowP1_p[j - 1] * hKernel[2][0] +
+                            inputRowP1_p[j    ] * hKernel[2][1] +
+                            inputRowP1_p[j + 1] * hKernel[2][2];
+            int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
+            outputRow_p[j - 1] = (uchar)(sum > 255 ? 255 : sum);
         }
     }
 }
