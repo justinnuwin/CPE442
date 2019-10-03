@@ -123,12 +123,18 @@ bool isOpened = cap.open("exampleVideo.mp4");   // Opens the video file
 - `int Mat::cols`
 - `int Mat::rows`
 - `void Mat::create(int rows, int cols, int type)`
-- 
+- `bool Mat::isContinuous()`
 - `uchar *Mat::ptr(int row = 0)`
 - `int Mat::type() const`
 
 For the `Mat` types we will only be using `CV_8UC3` for 3 channel (color) 8-bit unsigned pictures and `CV_8UC1` for 1 channel (grayscale) 8-bit unsigned pictures.
 
-The structure for the data sections of a `Mat` is for our 8-bit picture is
+The structure for the data sections of a `Mat` is for our 8-bit picture is an array of uchars in BGR order for a color photo, or an array of uchars of gamma values for a grayscale photo.
+
+For more information on how the image matrix is stored in memory see this [link](https://docs.opencv.org/2.4/doc/tutorials/core/how_to_scan_images/how_to_scan_images.html#how-the-image-matrix-is-stored-in-the-memory).
+
+![OpenCV Grayscale Matrix Storage Example](media/grayscale_mat_example.png)
+
+![OpenCV Color Matrix Storage Example](media/color_mat_example.png)
 
 9. For the future, you can create additional Make rules andd variables to allow you to make multiple targets.
