@@ -57,6 +57,13 @@ After OpenCV has built, install it.
 $ sudo make install
 ```
 
+We will want to use the standard OpenCV include paths (relative to `opencv2` not `opencv4/opencv2`) that is used in most tutorials online. Create a symlink (Linux shortcut) to `opencv4/opencv2` called `opencv2`.
+
+```
+$ cd /usr/local/include
+$ ln -s opencv4/opencv2 opencv2
+```
+
 _You now have OpenCV installed._
 
 2. Create a new folder for your assignment.
@@ -81,12 +88,47 @@ _The LDFLAGS field is for the linker to link external libraries into your progra
 
 The OpenCV core library contains the neccessary OpenCV functions and datastructures. The OpenCV highgui library includes code for creating GUIs, displaying images, and drawing. The OpenCV videoio library has the neccessary code for opening videos through the VideoCapture interface. This interface supports many video formats in addition to webcams. The OpenCV imgcodecs library allows your program to open and save images of many types. The m library is the C standard math library.
 
-5. 
+5. Now open `main.cpp` with your text editor of choice. Include the following files. These includes correspond to the libraries we added to the linker in the previous step.
 
-6. Create a Make rule called `clean`. This rule does not require any prerequisites. The body of this rule (and any other Make rules) can execute arbitrary bash commands. This rule will delete a file called `PROGRAM_NAME`. The linux command for removing commands is `$ rm`.
+```
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <cmath>
+```
 
-7. Now that your Makefile template is complete for making a single target, fill in the variable names with the correct names. CC will usually be `gcc` or `clang`. Reccomended CFLAGS are `-Wall -Werror -g`. 
+6. Write the main function so that it takes a command line argument:
 
-8. Run `$ make` from the command line and see if your program made successfully!
+```
+int main(int argc, char *argv[])
+```
+
+7. Create a VideoCapture object. This object has two constructors, one that takes an `int` which refers to the webcam index. There is a constructor that takes an `const string` referring to a path to a video file. The VideoCapture object also has a default constructor which initalizes the object without an input source which can later be speficied with the `open` function. When using the `open` method, the function returns a boolean whether the source was opened successfully.
+
+```
+VideoCapture cap(0);                    // Opens webcam 0
+VideoCapture cap("exampleVideo.mp4");   // Opens the video file
+
+// OR
+
+VideoCapture cap;
+bool isOpened = cap.open(0);                    // Opens webcam 0
+bool isOpened = cap.open("exampleVideo.mp4");   // Opens the video file
+```
+
+8. In a while loop, you will want to read one frame of the video into a `Mat` object. The `Mat` object represents a n-dimensional dense array. The object has many attributes and methods that are not important for this tutorial. The main attributes and methods we will concern ourselves with are the following:
+
+- `uchar *Mat::data`
+- `int Mat::cols`
+- `int Mat::rows`
+- `void Mat::create(int rows, int cols, int type)`
+- 
+- `uchar *Mat::ptr(int row = 0)`
+- `int Mat::type() const`
+
+For the `Mat` types we will only be using `CV_8UC3` for 3 channel (color) 8-bit unsigned pictures and `CV_8UC1` for 1 channel (grayscale) 8-bit unsigned pictures.
+
+The structure for the data sections of a `Mat` is for our 8-bit picture is
 
 9. For the future, you can create additional Make rules andd variables to allow you to make multiple targets.

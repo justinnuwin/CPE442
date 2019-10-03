@@ -29,8 +29,8 @@ void toGrayscale(Mat &input, Mat &output) {
     }
 
     for(int i = 0; i < nRows; i++) {
-        uchar *inputRow_p = input.ptr<uchar>(i);
-        uchar *outputRow_p = output.ptr<uchar>(i);
+        uchar *inputRow_p = input.ptr(i);
+        uchar *outputRow_p = output.ptr(i);
         for (int j = 0; j < nCols; j++) {
             outputRow_p[j] = computeGamma(&(inputRow_p[j * channels]));
         }

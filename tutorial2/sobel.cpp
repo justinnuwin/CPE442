@@ -20,10 +20,10 @@ void sobel(Mat &input, Mat &output) {
     output.create(nRows - 2, nCols - 2, CV_8UC1);
 
     for(int i = 1; i < nRows - 1; i++) {
-        uchar *inputRowM1_p = input.ptr<uchar>(i - 1);
-        uchar *inputRow0_p = input.ptr<uchar>(i);
-        uchar *inputRowP1_p = input.ptr<uchar>(i + 1);
-        uchar *outputRow_p = output.ptr<uchar>(i - 1);
+        uchar *inputRowM1_p = input.ptr(i - 1);
+        uchar *inputRow0_p = input.ptr(i);
+        uchar *inputRowP1_p = input.ptr(i + 1);
+        uchar *outputRow_p = output.ptr(i - 1);
         for (int j = 1; j < nCols - 1; j++) {   // Compiler will optimize mult const 2
             int vGradient = inputRowM1_p[j - 1] * vKernel[0][0] +
                             // inputRowM1_p[j    ] * vKernel[0][1] +
