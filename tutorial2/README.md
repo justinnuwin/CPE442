@@ -8,7 +8,7 @@ This tutorial assumes basic knowledge of C++, Makefiles, and Linux.
 
 _Hello, Sobel!_
 
-1. Depending on the distribution of Linux you are using, 
+1. Depending on the distribution of Linux you are using, there can be multiple methods to install OpenCV. 
 
 _Makefiles can also use the lowercase 'makefile', but this is more unconventional._
 

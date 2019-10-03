@@ -24,7 +24,7 @@ void sobel(Mat &input, Mat &output) {
         uchar *inputRow0_p = input.ptr<uchar>(i);
         uchar *inputRowP1_p = input.ptr<uchar>(i + 1);
         uchar *outputRow_p = output.ptr<uchar>(i - 1);
-        for (int j = 1; j < nCols - 1; j++) {
+        for (int j = 1; j < nCols - 1; j++) {   // Compiler will optimize mult const 2
             int vGradient = inputRowM1_p[j - 1] * vKernel[0][0] +
                             // inputRowM1_p[j    ] * vKernel[0][1] +
                             inputRowM1_p[j + 1] * vKernel[0][2] +
@@ -43,6 +43,8 @@ void sobel(Mat &input, Mat &output) {
                             inputRowP1_p[j - 1] * hKernel[2][0] +
                             inputRowP1_p[j    ] * hKernel[2][1] +
                             inputRowP1_p[j + 1] * hKernel[2][2];
+            // Approx. true sobel magnitude sqrt(g_x^2 + g_y^2)
+            // TODO: mag g = mag(g_x) + mag(g_y)
             int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
             outputRow_p[j - 1] = (uchar)(sum > 255 ? 255 : sum);
         }
