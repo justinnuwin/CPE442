@@ -44,8 +44,8 @@ void sobel(Mat &input, Mat &output) {
                             inputRowP1_p[j    ] * hKernel[2][1] +
                             inputRowP1_p[j + 1] * hKernel[2][2];
             // Approx. true sobel magnitude sqrt(g_x^2 + g_y^2)
-            // TODO: mag g = mag(g_x) + mag(g_y)
-            int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
+            // int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
+            int sum = abs(vGradient) + abs(hGradient);
             outputRow_p[j - 1] = (uchar)(sum > 255 ? 255 : sum);
         }
     }
