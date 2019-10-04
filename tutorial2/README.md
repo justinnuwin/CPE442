@@ -149,7 +149,7 @@ For more information on how the image matrix is stored in memory see this [link]
 
 **Note the BGR order that is used in OpenCV!**
 
-The C++ documentation for OpenCV is very helpful for learning about any of the functionality in the OpenCV library. For the C++ documentation, the library uses Doxygen to generate the documentation. It is available online at [docs.opencv.org](https://docs.opencv.org/4.1.1/).
+The C++ documentation for OpenCV is very helpful for learning about any of the functionality in the OpenCV library. For C++, the library uses Doxygen to generate the documentation. It is available online at [docs.opencv.org](https://docs.opencv.org/4.1.1/).
 
 10. We will use 'the efficient way' (classic C style) guide from the above link to iterate over each pixel in the image matrix. 
 
@@ -191,7 +191,7 @@ while (true) {
 }
 ```
 
-10. To display the frame on your screen we use the imshow function:
+10. To display the frame on your screen we use the `imshow` function:
 
 ```
 while (true) {
@@ -202,6 +202,6 @@ while (true) {
 }
 ```
 
-The imshow function displays an image on the screen in a window that you provide the name to. Since we are looping and constantly displaying a new image our video should play in the window that is created. The waitKey method is neccessary as it delays the program to give the highgui library time to process the draw request and draw the image on the screen. The argument is the number of milliseconds to delay by. 
+The `imshow` function displays an image on the screen in a window that you provide the name to. Since we are looping and constantly displaying a new image our video should play in the window that is created. The `waitKey` method is neccessary as it delays the program to give the highgui library time to process the draw request and draw the image on the screen. The argument is the number of milliseconds to delay by. 
 
 11. Those are the basics of OpenCV that you'll need to get started on your lab! Best of luck.
