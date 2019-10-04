@@ -6,8 +6,6 @@ This tutorial assumes basic knowledge of C++, Makefiles, and Linux.
 
 ![Hello, Sobel!](media/sobel.png)
 
-_Hello, Sobel!_
-
 1. On most distributions of Linux, OpenCV needs to be built from source. Run the following commands from the terminal. This tutorial is based off of tutorials you can find online for building OpenCV on Ubuntu 18.04.
 
 Upgrade your machine. Update repository to install latest dependencies.
@@ -82,13 +80,13 @@ $ mkdir <assignment_name>
 - CFLAGS: `-Wall -Werror -g`
 - LDFLAGS: `-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lm`
 - C_HEADERS: `<add header files here if you create more>`
-- C_SOURCES: `main..cpp <add more source files here if you create more>`
+- C_SOURCES: `main.cpp <add more source files here if you create more>`
 
 _The LDFLAGS field is for the linker to link external libraries into your program. For many libraries just including the include file is not enough as the include file does *not* contain the actual source of the library. For this program we are linking_ `opencv_core`, `opencv_highgui`, `opencv_videoio`, `opencv_imgcodecs`, _and_ `m`.
 
 The OpenCV core library contains the neccessary OpenCV functions and datastructures. The OpenCV highgui library includes code for creating GUIs, displaying images, and drawing. The OpenCV videoio library has the neccessary code for opening videos through the VideoCapture interface. This interface supports many video formats in addition to webcams. The OpenCV imgcodecs library allows your program to open and save images of many types. The m library is the C standard math library.
 
-5. Now open `main.cpp` with your text editor of choice. Include the following files. These includes correspond to the libraries we added to the linker in the previous step.
+5. Now open `main.cpp` with your text editor of choice. Include the following files. These includes correspond to the libraries we added to the linker in the previous step. The OpenCV methods are namespaced in the `cv` namespace. We will be importing in the entire namespace.
 
 ```
 #include <opencv2/core.hpp>
@@ -96,6 +94,8 @@ The OpenCV core library contains the neccessary OpenCV functions and datastructu
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <cmath>
+
+using namespace cv;
 ```
 
 6. Write the main function so that it takes a command line argument:
@@ -117,7 +117,16 @@ bool isOpened = cap.open(0);                    // Opens webcam 0
 bool isOpened = cap.open("exampleVideo.mp4");   // Opens the video file
 ```
 
-8. In a while loop, you will want to read one frame of the video into a `Mat` object. The `Mat` object represents a n-dimensional dense array. The object has many attributes and methods that are not important for this tutorial. The main attributes and methods we will concern ourselves with are the following:
+8. In a while loop, you will want to read one frame of the video into a `Mat` object.
+
+```
+while (true) {
+    Mat frame;
+    cap.read(frame);
+}
+```
+
+The `Mat` object represents a n-dimensional dense array. The object has many attributes and methods that are not important for this tutorial. The main attributes and methods we will concern ourselves with are the following:
 
 - `uchar *Mat::data`
 - `int Mat::cols`
@@ -138,9 +147,11 @@ For more information on how the image matrix is stored in memory see this [link]
 
 ![OpenCV Color Matrix Storage Example](media/color_mat_example.png)
 
+**Note the BGR order that is used in OpenCV!**
+
 The C++ documentation for OpenCV is very helpful for learning about any of the functionality in the OpenCV library. For the C++ documentation, the library uses Doxygen to generate the documentation. It is available online at [docs.opencv.org](https://docs.opencv.org/4.1.1/).
 
-9. We will use 'the efficient way' (classic C style) guide from the above link to iterate over each pixel in the image matrix. 
+10. We will use 'the efficient way' (classic C style) guide from the above link to iterate over each pixel in the image matrix. 
 
 _Note in the OpenCV tutorial in the above link, 'the efficient way' supposes a function:_
 
@@ -153,28 +164,44 @@ _Note the use of pointers and references. For those unfamiliar with C++ I would 
 [C++ Ownership Semantics Tutorial](https://ericlavesson.blogspot.com/2013/03/c-ownership-semantics.html)
 
 ```
-Mat I;
-CV_Assert(I.type() == CV_8UC3);
+while (true) {
+    // Declaring the Mat frame and reading in an image from VideoCapture...
 
-int channels = I.channels();
-int nRows = I.rows;
-int nCols = I.cols * channels;
+    CV_Assert(frame.type() == CV_8UC3);     // Make sure this is an 8-bit color image
 
-if (I.isContinuous()) { // This block is optional (speeds up the loop below)
-    nCols *= nRows;
-    nRows = 1;
-}
+    int channels = frame.channels();
+    frament nRows = frame.rows;
+    int nCols = frame.cols * channels;
 
-for(int i = 0; i < nRows; i++) {
-    uchar *row = I.ptr(i);
-    for (int j = 0; j < nCols; j++) {
-        // Do work here, for ex:
-        uchar pixelB = row[j];
-        uchar pixelG = row[j + 1];
-        uchar pixelR = row[j + 2];
-        uchar nextPixelB = row[j + channels];
+    if (frame.isContinuous()) { // This block is optional (speeds up the loop below)
+        nCols *= nRows;
+        nRows = 1;
+    }
+
+    for(int i = 0; i < nRows; i++) {
+        uchar *row = frame.ptr(i);
+        for (int j = 0; j < nCols; j++) {
+            // Do work here, for ex:
+            uchar pixelB = row[j];
+            uchar pixelG = row[j + 1];
+            uchar pixelR = row[j + 2];
+            uchar nextPixelB = row[j + channels];
+        }
     }
 }
 ```
 
-10. 
+10. To display the frame on your screen we use the imshow function:
+
+```
+while (true) {
+    // Declaring the Mat frame and reading in an image from VideoCapture...
+    // Iterating over the pixels in the frame. Doing interesing work...
+    imshow("Name of the window to display the image, frame);
+    waitKey(1);
+}
+```
+
+The imshow function displays an image on the screen in a window that you provide the name to. Since we are looping and constantly displaying a new image our video should play in the window that is created. The waitKey method is neccessary as it delays the program to give the highgui library time to process the draw request and draw the image on the screen. The argument is the number of milliseconds to delay by. 
+
+11. Those are the basics of OpenCV that you'll need to get started on your lab! Best of luck.
