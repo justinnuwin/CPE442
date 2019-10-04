@@ -122,6 +122,7 @@ bool isOpened = cap.open("exampleVideo.mp4");   // Opens the video file
 - `uchar *Mat::data`
 - `int Mat::cols`
 - `int Mat::rows`
+- `int Mat::channels()`
 - `void Mat::create(int rows, int cols, int type)`
 - `bool Mat::isContinuous()`
 - `uchar *Mat::ptr(int row = 0)`
@@ -137,4 +138,43 @@ For more information on how the image matrix is stored in memory see this [link]
 
 ![OpenCV Color Matrix Storage Example](media/color_mat_example.png)
 
-9. For the future, you can create additional Make rules andd variables to allow you to make multiple targets.
+The C++ documentation for OpenCV is very helpful for learning about any of the functionality in the OpenCV library. For the C++ documentation, the library uses Doxygen to generate the documentation. It is available online at [docs.opencv.org](https://docs.opencv.org/4.1.1/).
+
+9. We will use 'the efficient way' (classic C style) guide from the above link to iterate over each pixel in the image matrix. 
+
+_Note in the OpenCV tutorial in the above link, 'the efficient way' supposes a function:_
+
+`Mat &ScanImageAndReduceC(Mat &I, const uchar *const table)`
+
+_Note the use of pointers and references. For those unfamiliar with C++ I would reccomend the reader refresh themselves with the C++ pass-by-reference and ownership semantic features._
+
+[C++ Passing Arguments by Reference Tutorial](https://www.learncpp.com/cpp-tutorial/73-passing-arguments-by-reference/)
+
+[C++ Ownership Semantics Tutorial](https://ericlavesson.blogspot.com/2013/03/c-ownership-semantics.html)
+
+```
+Mat I;
+CV_Assert(I.type() == CV_8UC3);
+
+int channels = I.channels();
+int nRows = I.rows;
+int nCols = I.cols * channels;
+
+if (I.isContinuous()) { // This block is optional (speeds up the loop below)
+    nCols *= nRows;
+    nRows = 1;
+}
+
+for(int i = 0; i < nRows; i++) {
+    uchar *row = I.ptr(i);
+    for (int j = 0; j < nCols; j++) {
+        // Do work here, for ex:
+        uchar pixelB = row[j];
+        uchar pixelG = row[j + 1];
+        uchar pixelR = row[j + 2];
+        uchar nextPixelB = row[j + channels];
+    }
+}
+```
+
+10. 
