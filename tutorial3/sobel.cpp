@@ -29,7 +29,7 @@ static pthread_attr_t threadAttr;
 static pthread_mutex_t inputStreamAvailable = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t sobelCondVar = PTHREAD_COND_INITIALIZER;
 
-static Mat edges;
+static Mat edgesMaster, edgesThread;
 
 inline void
 sobel(int matStartingIdx, int matEndingIdx, int nCols, Mat &input, Mat &output) {
@@ -89,27 +89,36 @@ void *sobel_threaded(void *threadArgs) {
 
             int nRows = input.rows;
             nCols = input.cols;
-            edges.create(nRows - 2, nCols - 2, CV_8UC1);
+            edgesMaster.create(nRows - 2, nCols - 2, CV_8UC1);
+            edgesThread.create(nRows - 2, nCols - 2, CV_8UC1);
             
             thisMatStartingIdx = 1;
             thisMatEndingIdx = (int)nRows / 2;
             otherMatStartingIdx = thisMatEndingIdx + 1;
             otherMatEndingIdx = nRows - 1;
             pthread_cond_signal(&sobelCondVar);
-            sobel(thisMatStartingIdx, thisMatEndingIdx, nCols, input, edges);
+            sobel(thisMatStartingIdx, thisMatEndingIdx, nCols, input, edgesMaster);
             for (int i = 0; i < threadData->numThreads; i++) {
                 if (!pthread_equal(threads[i], threadData->thread))
                     pthread_join(threads[i], NULL);
             }
 
-            imshow("Sobel Video", edges);
+            for (int i = otherMatStartingIdx; i < otherMatEndingIdx - 1; i++) {
+                uchar *threadRow = edgesThread.ptr(i);
+                uchar *masterRow = edgesMaster.ptr(i);
+                for (int j = 1; j < nCols - 1; j++) 
+                    masterRow[j] = threadRow[j];
+            }
+
+            imshow("Sobel Video", edgesMaster);
             pthread_mutex_unlock(&inputStreamAvailable);
             waitKey(1);
 
             // End Critical Section
         } else {
             pthread_cond_wait(&sobelCondVar, &inputStreamAvailable);
-            sobel(otherMatStartingIdx, otherMatEndingIdx, nCols, input, edges);
+            sobel(otherMatStartingIdx, otherMatEndingIdx, nCols, input, edgesThread);
+            imshow("Sobel Video", edgesThread);
         }
     }
 
