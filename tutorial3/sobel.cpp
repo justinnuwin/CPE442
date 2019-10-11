@@ -25,11 +25,6 @@ const int hKernel[3][3] = {{-1, -2, -1},
 
 
 static pthread_t threads[2];
-static pthread_attr_t threadAttr;
-static pthread_mutex_t inputStreamAvailable = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t sobelCondVar = PTHREAD_COND_INITIALIZER;
-
-static Mat edgesMaster, edgesThread;
 
 inline void
 sobel(int matStartingIdx, int matEndingIdx, int nCols, Mat &input, Mat &output) {
@@ -65,45 +60,38 @@ sobel(int matStartingIdx, int matEndingIdx, int nCols, Mat &input, Mat &output) 
     }
 }
 
+// Threaded shared globals
+static pthread_mutex_t inputStreamAvailable = PTHREAD_MUTEX_INITIALIZER;
+static pthread_barrier_t readySobel, completedSobel;
+static int thisMatStartingIdx, matSliceIdx, otherMatEndingIdx;
+static int nCols;
+static Mat input, edgesMaster, edgesThread;
 
 void *sobel_threaded(void *threadArgs) {
     struct sobelThreadData *threadData = (struct sobelThreadData *)threadArgs;
 
-    int thisMatStartingIdx, thisMatEndingIdx;
-    int otherMatStartingIdx, otherMatEndingIdx;
-    int nCols;
-    Mat input;
-    while (true) { 
-        if (!pthread_mutex_trylock(&inputStreamAvailable)) {
+    while (true) {  // TODO: While not ^C
+        if (pthread_mutex_trylock(&inputStreamAvailable)) {
             // Critical Section
-            
             Mat frame;
             VideoCapture cap = threadData->input;
             cap.read(frame);
-            
             if (frame.empty())  // End of video
                 break;
-
             toGrayscale(frame, input);
             CV_Assert(input.type() == CV_8UC1);
-
             int nRows = input.rows;
             nCols = input.cols;
             edgesMaster.create(nRows - 2, nCols - 2, CV_8UC1);
             edgesThread.create(nRows - 2, nCols - 2, CV_8UC1);
-            
             thisMatStartingIdx = 1;
-            thisMatEndingIdx = (int)nRows / 2;
-            otherMatStartingIdx = thisMatEndingIdx + 1;
+            matSliceIdx = (int)nRows / 2;
             otherMatEndingIdx = nRows - 1;
-            pthread_cond_signal(&sobelCondVar);
-            sobel(thisMatStartingIdx, thisMatEndingIdx, nCols, input, edgesMaster);
-            for (int i = 0; i < threadData->numThreads; i++) {
-                if (!pthread_equal(threads[i], threadData->thread))
-                    pthread_join(threads[i], NULL);
-            }
+            pthread_barrier_wait(&readySobel);
+            sobel(thisMatStartingIdx, matSliceIdx, nCols, input, edgesMaster);
+            pthread_barrier_wait(&completedSobel);
 
-            for (int i = otherMatStartingIdx; i < otherMatEndingIdx - 1; i++) {
+            for (int i = matSliceIdx; i < otherMatEndingIdx - 1; i++) {
                 uchar *threadRow = edgesThread.ptr(i);
                 uchar *masterRow = edgesMaster.ptr(i);
                 for (int j = 1; j < nCols - 1; j++) 
@@ -112,13 +100,12 @@ void *sobel_threaded(void *threadArgs) {
 
             imshow("Sobel Video", edgesMaster);
             pthread_mutex_unlock(&inputStreamAvailable);
-            waitKey(1);
-
             // End Critical Section
+            waitKey(1);
         } else {
-            pthread_cond_wait(&sobelCondVar, &inputStreamAvailable);
-            sobel(otherMatStartingIdx, otherMatEndingIdx, nCols, input, edgesThread);
-            imshow("Sobel Video", edgesThread);
+            pthread_barrier_wait(&readySobel);
+            sobel(matSliceIdx, otherMatEndingIdx, nCols, input, edgesThread);
+            pthread_barrier_wait(&completedSobel);
         }
     }
 
@@ -140,13 +127,11 @@ int sobelVideo(VideoCapture &cap, int numThreads) {
             return 0;
         }
     }
-    pthread_attr_destroy(&threadAttr);
     return 1;
 }
 
 int sobelInit(int numThreads) {
-    pthread_cond_init(&sobelCondVar, NULL);
-    pthread_attr_init(&threadAttr);
-    pthread_attr_setdetachstate(&threadAttr, PTHREAD_CREATE_JOINABLE);
+    pthread_barrier_init(&readySobel, NULL, numThreads);
+    pthread_barrier_init(&completedSobel, NULL, numThreads);
     return 1;
 }
