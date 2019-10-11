@@ -8,13 +8,6 @@
 using namespace cv;
 using namespace std;
 
-struct sobelThreadData {
-    pthread_t &thread;
-    pthread_t *threads;
-    cv::VideoCapture &input;
-    int numThreads;
-};
-
 const int vKernel[3][3] = {{-1, 0, 1},
                            {-2, 0, 2},
                            {-1, 0, 1}};
@@ -25,6 +18,13 @@ const int hKernel[3][3] = {{-1, -2, -1},
 
 
 static pthread_t threads[2];
+
+struct sobelThreadData {
+    pthread_t &thread;
+    pthread_t *threads;
+    cv::VideoCapture &input;
+    int numThreads;
+};
 
 inline void
 sobel(int matStartingIdx, int matEndingIdx, int nCols, Mat &input, Mat &output) {
@@ -60,16 +60,16 @@ sobel(int matStartingIdx, int matEndingIdx, int nCols, Mat &input, Mat &output) 
     }
 }
 
-// Threaded shared globals
+// POSIX Thread Objects
 static pthread_mutex_t inputStreamAvailable = PTHREAD_MUTEX_INITIALIZER;
 static pthread_barrier_t readySobel, completedSobel;
+// Threaded shared globals
 static int thisMatStartingIdx, matSliceIdx, otherMatEndingIdx;
 static int nCols;
 static Mat input, edgesMaster, edgesThread;
 
 void *sobel_threaded(void *threadArgs) {
     struct sobelThreadData *threadData = (struct sobelThreadData *)threadArgs;
-
     while (true) {  // TODO: While not ^C
         if (pthread_mutex_trylock(&inputStreamAvailable)) {
             // Critical Section
@@ -116,7 +116,7 @@ void *sobel_threaded(void *threadArgs) {
     pthread_exit(NULL);
 }
 
-int sobelVideo(VideoCapture &cap, int numThreads) {
+void sobelVideo(VideoCapture &cap, int numThreads) {
     for (int i = 0; i < numThreads; i++) {
         struct sobelThreadData threadData = {.thread = threads[i],
                                              .threads = threads,
@@ -124,14 +124,15 @@ int sobelVideo(VideoCapture &cap, int numThreads) {
         if (int rc = pthread_create(&threads[i], NULL, sobel_threaded,
                 (void *)&threadData)) {
             cout << "Could not create thread" << rc << endl;
-            return 0;
         }
     }
-    return 1;
 }
 
-int sobelInit(int numThreads) {
+void sobelInit(int numThreads) {
     pthread_barrier_init(&readySobel, NULL, numThreads);
     pthread_barrier_init(&completedSobel, NULL, numThreads);
-    return 1;
+}
+
+void sobelCleanup() {
+    // Do something..
 }
