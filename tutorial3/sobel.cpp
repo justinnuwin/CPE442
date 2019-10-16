@@ -129,9 +129,7 @@ void sobelVideo(VideoCapture &cap, int numThreads) {
 
 void *sobelVideoDisplay(void *displayThreadArgs) {
     char *windowName = (char *)displayThreadArgs;
-    int sem;
     while (true) {
-        sem_getvalue(&outputReady, &sem);
         sem_wait(&outputReady);
         imshow(windowName, outputController);
         waitKey(1);
