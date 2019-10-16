@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
@@ -29,9 +30,8 @@ int main(int argc, char *argv[]) {
     if (!cap.isOpened())
         return -1;
 
-    sobelInit(NUMTHREADS);
+    sobelInit(NUMTHREADS, "Sobel Output");
     sobelVideo(cap, NUMTHREADS);
-    while(true) {
-        waitKey(10);
-    }
+    while(true)
+        sleep(1);
 }
