@@ -41,6 +41,7 @@ toGrayscale_threaded(int matStartingIdx, int matEndingIdx, Mat &input, Mat &outp
     int channels = input.channels();
     int nCols = input.cols;
 
+#pragma omp parallel for
     for(int i = matStartingIdx; i < matEndingIdx; i++) {
         uchar *inputRow_p = input.ptr(i);
         uchar *outputRow_p = output.ptr(i);

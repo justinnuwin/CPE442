@@ -1,6 +1,6 @@
 CC=g++
 PROGRAM_NAME=sobel
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -g -fopenmp
 LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lm -lpthread
 C_HEADERS=grayscale.hpp sobel.hpp
 C_SOURCES=main.cpp grayscale.cpp sobel.cpp

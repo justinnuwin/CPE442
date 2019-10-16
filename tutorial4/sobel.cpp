@@ -40,6 +40,7 @@ static Mat frame, input, outputController, outputThread;
 inline void
 sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
     int nCols = output.cols;
+#pragma omp parallel for
     for(int i = matStartingIdx; i < matEndingIdx - 1; i++) {
         uchar *inputRowM1_p = input.ptr(i - 1);
         uchar *inputRow0_p = input.ptr(i);
