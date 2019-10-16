@@ -13,7 +13,6 @@ inline uchar computeGamma(const uchar* bgrPixel) {
     return (uchar)(CCIR601_B_COEF * b + CCIR601_G_COEF * g + CCIR601_R_COEF * r);
 }
 
-
 void toGrayscale(Mat &input, Mat &output) {
     /* Converts to grayscale following CCIR 601 */
     CV_Assert(input.type() == CV_8UC3);
@@ -29,6 +28,20 @@ void toGrayscale(Mat &input, Mat &output) {
     }
 
     for(int i = 0; i < nRows; i++) {
+        uchar *inputRow_p = input.ptr(i);
+        uchar *outputRow_p = output.ptr(i);
+        for (int j = 0; j < nCols; j++) {
+            outputRow_p[j] = computeGamma(&(inputRow_p[j * channels]));
+        }
+    }
+}
+
+void
+toGrayscale_threaded(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
+    int channels = input.channels();
+    int nCols = input.cols;
+
+    for(int i = matStartingIdx; i < matEndingIdx; i++) {
         uchar *inputRow_p = input.ptr(i);
         uchar *outputRow_p = output.ptr(i);
         for (int j = 0; j < nCols; j++) {
