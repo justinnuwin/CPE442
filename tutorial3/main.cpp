@@ -31,5 +31,7 @@ int main(int argc, char *argv[]) {
 
     sobelInit(NUMTHREADS);
     sobelVideo(cap, NUMTHREADS);
-    while(true);
+    while(true) {
+        waitKey(10);
+    }
 }
