@@ -6,7 +6,7 @@ This tutorial assumes basic knowledge of C++, Makefiles, and Linux.
 
 OpenMP is an open source API that is used to explicitly direct multi-threaded shared memory parallelism. The API relies on compiler flags, library functions, and environmental variables to enable this parallelism. By abstracting various parallelization strategies behind a standard API, many of these strategies can be standardized across a variety of shared memory architectures and platforms. The library also emphasizes its ease of use, portability, and lightwight footprint.
 
-The main method for parallelizing tasks using OpenMP are using the compiler directives to signal to the compiler to utilize OpenMP to manipulate the data and pipeline it's computation. Since we are focusing on SIMD vectorization, we will focus on the `simd` directive instead of the `parallel` directive.
+The main method for parallelizing tasks using OpenMP are using the compiler directives to signal to the compiler to utilize OpenMP to manipulate the data and pipeline its computation. Since we are focusing on SIMD vectorization, we will focus on the `simd` directive instead of the `parallel` directive.
 
 ![Common Fork-Join parallelization model OpenMP will rely on](media/fork_join2.gif)
 
