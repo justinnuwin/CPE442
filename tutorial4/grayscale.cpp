@@ -40,13 +40,12 @@ void
 toGrayscale_threaded(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
     int channels = input.channels();
     int nCols = input.cols;
+    int i, j;   // Loop variables
 
-#pragma omp parallel for
-    for(int i = matStartingIdx; i < matEndingIdx; i++) {
-        uchar *inputRow_p = input.ptr(i);
-        uchar *outputRow_p = output.ptr(i);
-        for (int j = 0; j < nCols; j++) {
-            outputRow_p[j] = computeGamma(&(inputRow_p[j * channels]));
+#pragma omp simd private(j) collapse(2)
+    for(i = matStartingIdx; i < matEndingIdx; i++) {
+        for (j = 0; j < nCols; j++) {
+            output.ptr(i)[j] = computeGamma(&(input.ptr(i)[j * channels]));
         }
     }
 }

@@ -40,41 +40,39 @@ static Mat frame, input, outputController, outputThread;
 inline void
 sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
     int nCols = output.cols;
-#pragma omp parallel for
-    for(int i = matStartingIdx; i < matEndingIdx - 1; i++) {
-        uchar *inputRowM1_p = input.ptr(i - 1);
-        uchar *inputRow0_p = input.ptr(i);
-        uchar *inputRowP1_p = input.ptr(i + 1);
-        uchar *outputRow_p = output.ptr(i - 1);
-        for (int j = 1; j < nCols - 1; j++) {   // Compiler will optimize mult const 2
-            int vGradient = inputRowM1_p[j - 1] * vKernel[0][0] +
-                            // inputRowM1_p[j    ] * vKernel[0][1] +
-                            inputRowM1_p[j + 1] * vKernel[0][2] +
-                            inputRow0_p[j - 1] * vKernel[1][0] +
-                            // inputRow0_p[j    ] * vKernel[1][1] +
-                            inputRow0_p[j + 1] * vKernel[1][2] +
-                            inputRowP1_p[j - 1] * vKernel[2][0] +
-                            // inputRowP1_p[j    ] * vKernel[2][1] +
-                            inputRowP1_p[j + 1] * vKernel[2][2];
-            int hGradient = inputRowM1_p[j - 1] * hKernel[0][0] +
-                            inputRowM1_p[j    ] * hKernel[0][1] +
-                            inputRowM1_p[j + 1] * hKernel[0][2] +
-                            // inputRow0_p[j - 1] * hKernel[1][0] +
-                            // inputRow0_p[j    ] * hKernel[1][1] +
-                            // inputRow0_p[j + 1] * hKernel[1][2] +
-                            inputRowP1_p[j - 1] * hKernel[2][0] +
-                            inputRowP1_p[j    ] * hKernel[2][1] +
-                            inputRowP1_p[j + 1] * hKernel[2][2];
+    int i, j;   // Loop variables
+#pragma omp simd private(j) collapse(2)
+    for(i = matStartingIdx; i < matEndingIdx - 1; i++) {
+        for (j = 1; j < nCols - 1; j++) {   // Compiler will optimize mult const 2
+            int vGradient = input.ptr(i-1)[j - 1] * vKernel[0][0] +
+                            // input.ptr(i-1)[j    ] * vKernel[0][1] +
+                            input.ptr(i-1)[j + 1] * vKernel[0][2] +
+                            input.ptr(i)[j - 1] * vKernel[1][0] +
+                            // input.ptr(i)[j    ] * vKernel[1][1] +
+                            input.ptr(i)[j + 1] * vKernel[1][2] +
+                            input.ptr(i+1)[j - 1] * vKernel[2][0] +
+                            // input.ptr(i+1)[j    ] * vKernel[2][1] +
+                            input.ptr(i+1)[j + 1] * vKernel[2][2];
+            int hGradient = input.ptr(i-1)[j - 1] * hKernel[0][0] +
+                            input.ptr(i-1)[j    ] * hKernel[0][1] +
+                            input.ptr(i-1)[j + 1] * hKernel[0][2] +
+                            // input.ptr(i)[j - 1] * hKernel[1][0] +
+                            // input.ptr(i)[j    ] * hKernel[1][1] +
+                            // input.ptr(i)[j + 1] * hKernel[1][2] +
+                            input.ptr(i+1)[j - 1] * hKernel[2][0] +
+                            input.ptr(i+1)[j    ] * hKernel[2][1] +
+                            input.ptr(i+1)[j + 1] * hKernel[2][2];
             // Approx. true sobel magnitude sqrt(g_x^2 + g_y^2)
             // int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
             int sum = abs(vGradient) + abs(hGradient);
-            outputRow_p[j - 1] = (uchar)(sum > 255 ? 255 : sum);
+            output.ptr(i-1)[j - 1] = (uchar)(sum > 255 ? 255 : sum);
         }
     }
 }
 
 void *sobel_threaded(void *threadArgs) {
     struct sobelThreadData *threadData = (struct sobelThreadData *)threadArgs;
+    int threadNum = threadData->threadNum;
     while (true) {  // TODO: Break when ^C caught
         if (pthread_mutex_trylock(&inputStreamAvailable)) {
             // Critical Section
@@ -91,6 +89,7 @@ void *sobel_threaded(void *threadArgs) {
             thisMatStartingIdx = 1;
             matSliceIdx = (int)nRows / 2;   // TODO: Add support for more than 2 threads
             otherMatEndingIdx = nRows - 1;
+            cout << threadNum << endl;
             pthread_barrier_wait(&readyFrame);
             toGrayscale_threaded(thisMatStartingIdx, matSliceIdx, frame, input);
             sobel(thisMatStartingIdx, matSliceIdx, input, outputController);
@@ -105,6 +104,7 @@ void *sobel_threaded(void *threadArgs) {
             pthread_mutex_unlock(&inputStreamAvailable);
             // End Critical Section
         } else {
+            cout << threadNum << endl;
             pthread_barrier_wait(&readyFrame);
             toGrayscale_threaded(matSliceIdx, otherMatEndingIdx, frame, input);
             sobel(matSliceIdx, otherMatEndingIdx, input, outputThread);

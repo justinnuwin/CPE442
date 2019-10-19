@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     if (!cap.isOpened())
         return -1;
 
-    sobelInit(NUMTHREADS, "Sobel Output");
+    sobelInit(NUMTHREADS, "Sobel Ouput");
     sobelVideo(cap, NUMTHREADS);
     while(true)
         sleep(1);

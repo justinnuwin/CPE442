@@ -1,131 +1,101 @@
-# Tutorial 3: Multithreading and Synchronization
+# Tutorial 4: Using SIMD
 
-Justin Nguyen 10/11/2019
+Justin Nguyen 10/18/2019
 
 This tutorial assumes basic knowledge of C++, Makefiles, and Linux.
 
-1. Many different types of functions can be parallelized using threads. This tutorial
-will cover the use of POSIX pthreads.
+OpenMP is an open source API that is used to explicitly direct multi-threaded shared memory parallelism. The API relies on compiler flags, library functions, and environmental variables to enable this parallelism. By abstracting various parallelization strategies behind a standard API, many of these strategies can be standardized across a variety of shared memory architectures and platforms. The library also emphasizes its ease of use, portability, and lightwight footprint.
 
-In the pthreads API, we will be covering the following objects:
+The main method for parallelizing tasks using OpenMP are using the compiler directives to signal to the compiler to utilize OpenMP to manipulate the data and pipeline it's computation. Since we are focusing on SIMD vectorization, we will focus on the `simd` directive instead of the `parallel` directive.
 
-pthread: The main thread object
-attr: Attributes that can be applied to pthreads
-mutex: Resource locking mechanism
-barrier: Synchronization barrier
+![Common Fork-Join parallelization model OpenMP will rely on](media/fork_join2.gif)
 
-[This pthreads tutorial from LLNL contains more informations about the pthreads library with some good examples](https://computing.llnl.gov/tutorials/pthreads/#PthreadsAPI)
+![What OpenMP SIMD Vectorization may look like](media/simdVectorization.png)
 
-2. To compile a program with pthreads the following are required:
+Resources on OpenMP:
 
-- Include file (source/header): `#include <pthread.h>`
-- Linker library (Makefile/cli): `-lpthread`
+[SIMD Vectorization using OpenMP Slidedecj from Intel Talk](https://doc.itc.rwth-aachen.de/download/attachments/28344675/SIMD%20Vectorization%20with%20OpenMP.PDF?version=1&modificationDate=1480523704000&api=v2)
 
-3. This is the signature for the `pthread_create` function:
+[General OpenMP Information from LLNL](https://computing.llnl.gov/tutorials/openMP/)
 
-```int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
-                   void *(*start_routine) (void *), void *arg);```
+OpenMP provides threading and parallelization tools similar to how pthreads provides a POSIX compliant thread api. These can be mixed and matched, but keep in mind that OpenMP also provides higher level (and some lower level) abstraction on how explicit threading is performed. You may choose to keep your current POSIX threading and only use OpenMP for SIMD vectorization of the individual thread loops or use OpenMP to explicitly thread your grayscale and sobel operators. This tutorial will not cover the `parallel-*` required for threading using OpenMP, but the resources above should provide the information neccessary to do so.
 
-The following example should show how to initialize threads. Pay close attention
-to the types of the arguments.
+1. Building with OpenMP:
+
+OpenMP will require the `-fopenmp` compiler flag to be set. This can usually go in the `CFLAGS` section of your Makefile. For example:
 
 ```
-#include <pthreads.h>
+CFLAGS=-Wall -Werror -g -fopenmp
 
-pthread_t thread[2];
+all: $(C_SOURCES) $(C_HEADERS)
+	$(CC) -o $(PROGRAM_NAME) $(CFLAGS) $(C_SOURCES) $(LDFLAGS)
+```
 
-struct threadArgs {
-    int a;
-    int b;
-};
+2. Anatomy of OpenMP directive, they are formatted as so:
 
-void *fnForThread1();
-void *fnForThread2(void *threadArgs);
-void *thread1Status;
-void *thread2Status;
+```
+#pragma omp directive-name [clause, [clause, [...]]]
+// The newline directly following the #pragma statement is required
+// pragma statements are usually case sensitive
+// only one directive-name may be specified per directive
+// Long directive lines can be "continued" on succeeding lines by
+// escaping the newline character with a backslash ("\") at the end
+// of a directive line. 
+```
 
-int main(int argc, char *argv[]) {
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    struct threadArgs = {.a = 0, .b = 1};
-    int retVal1 = pthread_create(&thread[0], NULL, fnForThread1, NULL);
-    int retVal2 = pthread_create(&thread[1], NULL, fnForThread2, (void *)&threadArgs);
-    // Parent thread will continue
-    // until we reach a point when we wait for the child threads to finish
-    int retVal3 = pthread_join(thread[0], &thread1Status)
-    int retVal4 = pthread_join(thread[1], &thread2Status)
-    // Parent collects child thread's result
+_For the_ `simd` _directive, these cannot be nested._
+
+2. We will be focusing on the directive `simd`. Here is a simple example:
+
+```
+#pragma omp simd
+for-loops
+```
+
+What this does is it cuts the loop into chunks that fit a SIMD vector register. It *does not* parallelize the loop body (use `#pragma omp for simd` or `#pragma omp parallel for simd` instead). Remember, _SIMD = single instruction, multiple data_.
+
+When no clauses are provided to the `simd` directive, it will try
+and automatically vectorize the operation. The possible ramifications for
+this include:
+
+- Increased complexity of instructions makes it hard for the compiler to select proper instructions
+- Code pattern needs to be recognized by the compiler
+- Precision requirements often inhibit SIMD code gen
+
+Usually the compiler will automatically attempt to vecotrize your code if
+compiled the with level 3 optimization flag `-O3`.
+
+3. The clauses that can be used for SIMD loops are:
+
+- `private(var-list)`: Uninitialized vectors
+- `reduction(op:var-list)`: Create private variables for `var-list` and apply a reduction operator `op` at the end of the construct. This is used only for operations that go from a vector to a single value.
+- `safelen(length)`: Maximum vector length
+- `simdlen(length)`: Length of SIMD registers (must be less than safelen)
+- `linear(list[:linear-step])`: Variable's value is linearly related to the iteration value 
+- `aligned(list[:alignment])`: The list is memory aligned
+- `collapse(n)`: Number of loops associated with the construct
+
+Here is an example for `sprod` a function which returns the scalar product of two arrays:
+
+```
+float sprod(float *a, float *b, int n) {
+    float sum = 0.0f;
+#pragma omp simd reduction(+:sum) 
+    for (intk=0; k<n; k++)
+        sum += a[k] * b[k];
+    return sum;
 }
 ```
 
-This snippet of code initializes the attributes for new threads to be joinable. We 
-then create the new threads running the fnForThread1 and fnForThread2 functions.
-When the parent thread is ready for the child threads result, the pthread_join
-function will force the calling thread to wait for the child thread to finish.
-
-_Note the pthread attr is not always required as some implementations as the default
-attribute for new threads is joinable._
-
-When actually implementing a multithreaded program, the simplest method of sharing 
-memory between the threads are global variables.
-
-4. To prevent race conditions and meet resource access rules, synchronization is
-required. The most basic synchronization techniques are mutexes, semaphores,
-barriers, and monitors. The pthread library includes implementations for this in
-addition to condition variables which can also be used for thread synchronization.
-This tutorial will cover mutexes and barriers. The other synchronization techniques
-are explained in the LLNL tutorial or on many pages online.
-
-Mutex: Named for mutual exclusion, this technique of thread synchronization is used
-to enforce access to a resource or a serialized section of code. It works like so:
-
-1. A thread locks the mutex
-2. Other threads who try to lock the mutex will either wait (`pthread_mutex_lock`)
-or continue (`pthread_mutex_trylock`) with a busy signal
-3. The thread with the mutex lock will do its work in the "critical section"
-4. Once the work in the "critical section" is finished, the thread will unlock the
-mutex allowing waiting threads to continue
+Here is another example vectorizing a nested for loop:
 
 ```
-#include <pthread.h>
-
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
-// Inside some threaded function
-    pthread_mutex_lock(&mutex);
-    // Do work in critical section
-    pthread_mutex_unlock(&mutex);
-    // End critical section
-```
-
-Barrier: A synchronization technique that acts like a barrier in that a predetermined
-number of threads must pause at the barrier before passing. This can be used to 
-control access to a critical section by ensuring some (or all threads) are at the
-barrier.
-
-```
-#include <pthread.h>
-
-pthread_barrier_t barrier;
-
-void setupFunction(int numThreads) {
-    pthread_barrier_init(&barier, NULL, numThreads);
-}
-
-// Inside some threaded function with multiple threads about to reach the barrier:
-    pthread_barrier_wait(&barrier);	 // Wait for numThreads
-    // Work will commence when enough threads reach barrier
-// End of some threaded function
-
-int main(int argc, char *argv[]) {
-    int numThreads;
-    setupFunction(numThreads);
-    // Start threaded work
-    // ...
+int i, j;
+#pragma omp simd private(j) collapse(2)
+for (i = 0; i < n; i++) {
+    // The nested for pattern does not allow declarations here
+    for (j = 0; j < m; j++) {
+        // Do work...
+    }
 }
 ```
-
-5. Use the information in this guide to write some threaded programs! GDB can be
-used to debug multithreaded programs, but it is also very helpful to debug by
-print statement.
