@@ -8,6 +8,9 @@ C_SOURCES=main.cpp grayscale.cpp sobel.cpp
 all: $(C_HEADERS) $(C_SOURCES)
 	$(CC) -o $(PROGRAM_NAME) $(CFLAGS) $(C_SOURCES) $(LDFLAGS)
 
+sobel.o: sobel.cpp sobel.hpp
+	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
+
 .PHONY: clean
 
 clean:

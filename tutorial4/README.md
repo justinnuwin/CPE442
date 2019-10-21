@@ -14,9 +14,11 @@ The main method for parallelizing tasks using OpenMP are using the compiler dire
 
 Resources on OpenMP:
 
-[SIMD Vectorization using OpenMP Slidedecj from Intel Talk](https://doc.itc.rwth-aachen.de/download/attachments/28344675/SIMD%20Vectorization%20with%20OpenMP.PDF?version=1&modificationDate=1480523704000&api=v2)
+[SIMD Vectorization using OpenMP Slidedeck from Intel Talk](https://doc.itc.rwth-aachen.de/download/attachments/28344675/SIMD%20Vectorization%20with%20OpenMP.PDF?version=1&modificationDate=1480523704000&api=v2)
 
 [General OpenMP Information from LLNL](https://computing.llnl.gov/tutorials/openMP/)
+
+[More in-depth SIMD information with OpenMP](https://moodle.rrze.uni-erlangen.de/pluginfile.php/12922/mod_resource/content/4/07_SIMD.pdf)
 
 OpenMP provides threading and parallelization tools similar to how pthreads provides a POSIX compliant thread api. These can be mixed and matched, but keep in mind that OpenMP also provides higher level (and some lower level) abstraction on how explicit threading is performed. You may choose to keep your current POSIX threading and only use OpenMP for SIMD vectorization of the individual thread loops or use OpenMP to explicitly thread your grayscale and sobel operators. This tutorial will not cover the `parallel-*` required for threading using OpenMP, but the resources above should provide the information neccessary to do so.
 
