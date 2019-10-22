@@ -14,18 +14,8 @@ sobel.o: sobel.cpp sobel.hpp
 grayscale.o: grayscale.cpp grayscale.hpp
 	$(CC) -o $@ $(CFLAGS) -c $< $(LDFLAGS)
 
-test: simd simd_openmp
-
-simd: simd_test.cpp
-	$(CC) -o $@ -g $<
-
-simd_openmp: simd_test.cpp
-	$(CC) -o $@ -g -fopenmp $<
-
-
 .PHONY: clean
 
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)
-	rm -f simd simd_openmp
