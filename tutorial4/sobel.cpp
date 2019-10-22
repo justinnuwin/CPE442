@@ -41,10 +41,11 @@ inline void
 sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
     int nCols = output.cols;
     int i, j;   // Loop variables
-#pragma omp simd private(j) collapse(2)
+    int vGradient, hGradient, sum;
     for(i = matStartingIdx; i < matEndingIdx - 1; i++) {
+#pragma omp simd
         for (j = 1; j < nCols - 1; j++) {   // Compiler will optimize mult const 2
-            int vGradient = input.ptr(i-1)[j - 1] * vKernel[0][0] +
+            vGradient = input.ptr(i-1)[j - 1] * vKernel[0][0] +
                             // input.ptr(i-1)[j    ] * vKernel[0][1] +
                             input.ptr(i-1)[j + 1] * vKernel[0][2] +
                             input.ptr(i)[j - 1] * vKernel[1][0] +
@@ -53,7 +54,7 @@ sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
                             input.ptr(i+1)[j - 1] * vKernel[2][0] +
                             // input.ptr(i+1)[j    ] * vKernel[2][1] +
                             input.ptr(i+1)[j + 1] * vKernel[2][2];
-            int hGradient = input.ptr(i-1)[j - 1] * hKernel[0][0] +
+            hGradient = input.ptr(i-1)[j - 1] * hKernel[0][0] +
                             input.ptr(i-1)[j    ] * hKernel[0][1] +
                             input.ptr(i-1)[j + 1] * hKernel[0][2] +
                             // input.ptr(i)[j - 1] * hKernel[1][0] +
@@ -64,7 +65,7 @@ sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
                             input.ptr(i+1)[j + 1] * hKernel[2][2];
             // Approx. true sobel magnitude sqrt(g_x^2 + g_y^2)
             // int sum = round(sqrt(pow(vGradient, 2) + pow(hGradient, 2)));
-            int sum = abs(vGradient) + abs(hGradient);
+            sum = abs(vGradient) + abs(hGradient);
             output.ptr(i-1)[j - 1] = (uchar)(sum > 255 ? 255 : sum);
         }
     }
