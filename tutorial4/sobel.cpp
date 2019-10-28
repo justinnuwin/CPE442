@@ -21,7 +21,6 @@ const int hKernel[3][3] = {{-1, -2, -1},
                            { 1,  2,  1}};
 
 struct sobelThreadData {
-    pthread_t *thread;
     int threadNum;
     cv::VideoCapture *input;
 };
@@ -74,6 +73,7 @@ sobel(int matStartingIdx, int matEndingIdx, Mat &input, Mat &output) {
 void *sobel_threaded(void *threadArgs) {
     struct sobelThreadData *threadData = (struct sobelThreadData *)threadArgs;
     int threadNum = threadData->threadNum;
+    pthread_t thisThread = processingThreads[threadNum];
     while (true) {  // TODO: Break when ^C caught
         if (pthread_mutex_trylock(&inputStreamAvailable)) {
             // Critical Section
@@ -90,7 +90,6 @@ void *sobel_threaded(void *threadArgs) {
             thisMatStartingIdx = 1;
             matSliceIdx = (int)nRows / 2;   // TODO: Add support for more than 2 threads
             otherMatEndingIdx = nRows - 1;
-            cout << threadNum << endl;
             pthread_barrier_wait(&readyFrame);
             toGrayscale_threaded(thisMatStartingIdx, matSliceIdx, frame, input);
             sobel(thisMatStartingIdx, matSliceIdx, input, outputController);
@@ -105,13 +104,19 @@ void *sobel_threaded(void *threadArgs) {
             pthread_mutex_unlock(&inputStreamAvailable);
             // End Critical Section
         } else {
-            cout << threadNum << endl;
             pthread_barrier_wait(&readyFrame);
             toGrayscale_threaded(matSliceIdx, otherMatEndingIdx, frame, input);
             sobel(matSliceIdx, otherMatEndingIdx, input, outputThread);
             pthread_barrier_wait(&completedSobel);
         }
     }
+    for (int i = 0; i < (int)processingThreads.size(); i++) {
+        if (!pthread_equal(thisThread, processingThreads[i])) {
+            cout << "Cancelling thread " << i << endl;
+            pthread_cancel(processingThreads[i]);
+        }
+    }
+    cout << "Thread exiting " << threadNum << endl;
     pthread_exit(NULL);
 }
 
@@ -119,7 +124,6 @@ void sobelVideo(VideoCapture &cap, int numThreads) {
     processingThreads = vector<pthread_t> (numThreads);
     threadArgs = vector<struct sobelThreadData> (numThreads);
     for (int i = 0; i < numThreads; i++) {
-        threadArgs[i].thread = &processingThreads[i];
         threadArgs[i].threadNum = i;
         threadArgs[i].input = &cap;
         if (int rc = pthread_create(&processingThreads[i], NULL, sobel_threaded,
@@ -148,6 +152,12 @@ void sobelInit(int numThreads, const char displayWindowName[]) {
     }
 }
 
+// This is a blocking function call
 void sobelCleanup() {
-    // Do something..
+    for (int i = 0; i < (int)processingThreads.size(); i++) {
+        pthread_join(processingThreads[i], NULL);
+        cout << "Joined thread " << i << endl;
+        break;
+    }
+    pthread_cancel(displayThread);
 }

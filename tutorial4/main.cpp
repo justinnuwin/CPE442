@@ -32,6 +32,6 @@ int main(int argc, char *argv[]) {
 
     sobelInit(NUMTHREADS, "Sobel Ouput");
     sobelVideo(cap, NUMTHREADS);
-    while(true)
-        sleep(1);
+    sobelCleanup();
+    return 0;
 }
