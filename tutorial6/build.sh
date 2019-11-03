@@ -5,7 +5,7 @@ git submodule update petalinux-docker
 
 cp petalinux-docker/Dockerfile petalinux-docker/accept-eula.sh .
 
-patch -u Dockerfile -i Dockerfile.patch
+patch -u Dockerfile -i Dockerfile.patch -R
 
 echo "Download petalinux from https://www.xilinx.com/support/download.html"
 # Installer should have a name like: petalinux-v2018.3-final-installer.run
@@ -23,4 +23,4 @@ docker build --build-arg PETA_VERSION=$peta_version --build-arg PETA_RUN_FILE=$p
 rm -f Dockerfile accept-eula.sh
 
 mkdir -p project 
-wget -o project/Petalinux-Zybo-2017.4-1.bsp https://github.com/Digilent/Petalinux-Zybo/releases/download/v2017.4-1/Petalinux-Zybo-2017.4-1.bsp
+wget --show-progress -P project/ https://github.com/Digilent/Petalinux-Zybo/releases/download/v2017.4-1/Petalinux-Zybo-2017.4-1.bsp
