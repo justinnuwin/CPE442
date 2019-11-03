@@ -22,5 +22,6 @@ docker build --build-arg PETA_VERSION=$peta_version --build-arg PETA_RUN_FILE=$p
 
 rm -f Dockerfile accept-eula.sh
 
-mkdir -p project 
-wget --show-progress -P project/ https://github.com/Digilent/Petalinux-Zybo/releases/download/v2017.4-1/Petalinux-Zybo-2017.4-1.bsp
+git submodule init Petalinux-Zybo
+git submodule update Petalinux-Zybo
+# git -C Petalinux-Zybo checkout v2017.4-1
