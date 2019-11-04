@@ -28,9 +28,11 @@ rm -f Dockerfile accept-eula.sh
 git submodule init Petalinux-Zybo
 git submodule update Petalinux-Zybo
 git -C Petalinux-Zybo checkout v2017.4-1
-# wget https://github.com/Digilent/Petalinux-Zybo/releases/download/v2017.4-1/Petalinux-Zybo-2017.4-1.bsp -P project/
 
 mkdir -p project/ubuntu-base-18.04-armhf/rootfs
-# http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/
+# General Ubuntu Base release page: http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/
 wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.3-base-armhf.tar.gz -P project/ubuntu-base-18.04-armhf/
+
+# read to delay sudo password prompt timeout expiring
+read -p "Press any key to continue " -n 1 -r
 sudo tar -xzf project/ubuntu-base-18.04-armhf/*.tar.gz -C project/ubuntu-base-18.04-armhf/rootfs/
