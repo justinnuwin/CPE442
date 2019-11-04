@@ -1,20 +1,20 @@
---- Dockerfile	2019-11-03 13:34:46.300790218 -0800
-+++ petalinux-docker/Dockerfile	2019-11-03 13:05:44.347447269 -0800
-@@ -4,8 +4,11 @@
+--- Dockerfile.orig	2019-11-03 18:58:21.280891090 -0800
++++ Dockerfile	2019-11-03 18:58:04.150890999 -0800
+@@ -4,11 +4,8 @@
  
  # build with docker build --build-arg PETA_VERSION=2018.1 --build-arg PETA_RUN_FILE=petalinux-v2018.1-final-installer.run -t petalinux:2018.1 .
  
-+ARG UBUNTU_MIRROR=mirror.tuna.tsinghua.edu.cn
-+
+-ARG UBUNTU_MIRROR=mirror.tuna.tsinghua.edu.cn
+-
  #install dependences:
--RUN dpkg --add-architecture i386 && apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
-+RUN sed -i.bak s/archive.ubuntu.com/${UBUNTU_MIRROR}/g /etc/apt/sources.list && \
-+  dpkg --add-architecture i386 && apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
+-RUN sed -i.bak s/archive.ubuntu.com/${UBUNTU_MIRROR}/g /etc/apt/sources.list && \
+-  dpkg --add-architecture i386 && apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
++RUN dpkg --add-architecture i386 && apt-get update &&  DEBIAN_FRONTEND=noninteractive apt-get install -y -q \
    build-essential \
    sudo \
    tofrodos \
-@@ -86,4 +89,3 @@
+@@ -89,3 +86,4 @@
  #add vivado tools to path
  RUN echo "source /opt/Xilinx/petalinux/settings.sh" >> /home/vivado/.bashrc
  
--RUN rm -f /${PETA_RUN_FILE}
++RUN rm -f /${PETA_RUN_FILE}

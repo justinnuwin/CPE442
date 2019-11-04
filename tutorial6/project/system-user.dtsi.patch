@@ -1,0 +1,11 @@
+--- system-user.dtsi.orig	2019-11-03 18:56:27.390890559 -0800
++++ system-user.dtsi	2019-11-03 18:56:50.614223999 -0800
+@@ -6,7 +6,7 @@
+ 	compatible = "digilent,zynq-zybo", "xlnx,zynq-7000";
+ 
+ 	chosen {
+-		bootargs = "console=ttyPS0,115200 earlyprintk uio_pdrv_genirq.of_id=generic-uio";
++        bootargs = "console=ttyPS0,115200 earlyprintk uio_pdrv_genirq.of_id=generic-uio root=/dev/mmcblk0p2 rw rootwait";
+ 	};
+ 
+ 	usb_phy0: usb_phy@0 {

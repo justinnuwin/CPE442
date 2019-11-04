@@ -5,7 +5,7 @@ git submodule update petalinux-docker
 
 cp petalinux-docker/Dockerfile petalinux-docker/accept-eula.sh .
 
-patch -u Dockerfile -i Dockerfile.patch -R
+patch -u Dockerfile -i Dockerfile.patch
 
 echo "Download petalinux from https://www.xilinx.com/support/download.html"
 # Installer should have a name like: petalinux-v2018.3-final-installer.run
