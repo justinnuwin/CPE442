@@ -7,7 +7,7 @@ cp petalinux-docker/Dockerfile petalinux-docker/accept-eula.sh .
 
 patch -u Dockerfile -i Dockerfile.patch
 
-echo "Download petalinux from https://www.xilinx.com/support/download.html"
+echo "Download petalinux from https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools.html"
 # Installer should have a name like: petalinux-v2017.4-final-installer.run
 # Use Petalinux 2017.4 as it matches the latest Zybo build. Using a newer
 # version will break on kernel compilation as 2017 builds Kernel 4.9. This
