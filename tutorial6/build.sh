@@ -1,7 +1,6 @@
 #!/bin/bash
 
-git submodule init petalinux-docker
-git submodule update petalinux-docker
+git submodule update --init petalinux-docker
 
 cp petalinux-docker/Dockerfile petalinux-docker/accept-eula.sh .
 
@@ -25,9 +24,9 @@ docker build --build-arg PETA_VERSION=$peta_version --build-arg PETA_RUN_FILE=$p
 
 rm -f Dockerfile accept-eula.sh
 
-git submodule init Petalinux-Zybo
-git submodule update Petalinux-Zybo
-git -C Petalinux-Zybo checkout v2017.4-1
+# Yocto can't build git dependencies with nested submodules, so we will clone
+git clone --recursive https://github.com/Digilent/Petalinux-Zybo-Z7-10.git project/Petalinux-Zybo/
+git -C project/Petalinux-Zybo/ checkout v2017.4-1
 
 mkdir -p project/ubuntu-base-18.04-armhf/rootfs
 # General Ubuntu Base release page: http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/
