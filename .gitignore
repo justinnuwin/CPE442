@@ -1,4 +1,4 @@
 *.
 petalinux-*.run
 tutorial6/project/Petalinux-Zybo/
-tutorial6/project/ubuntu*
+tutorial6/project/rootfs

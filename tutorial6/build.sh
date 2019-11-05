@@ -25,13 +25,24 @@ docker build --build-arg PETA_VERSION=$peta_version --build-arg PETA_RUN_FILE=$p
 rm -f Dockerfile accept-eula.sh
 
 # Yocto can't build git dependencies with nested submodules, so we will clone
-git clone --recursive https://github.com/Digilent/Petalinux-Zybo-Z7-10.git project/Petalinux-Zybo/
+git clone --recursive https://github.com/Digilent/Petalinux-Zybo.git project/Petalinux-Zybo/
 git -C project/Petalinux-Zybo/ checkout v2017.4-1
 
-mkdir -p project/ubuntu-base-18.04-armhf/rootfs
-# General Ubuntu Base release page: http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/
-wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.3-base-armhf.tar.gz -P project/ubuntu-base-18.04-armhf/
 
-# read to delay sudo password prompt timeout expiring
-read -p "Press any key to continue " -n 1 -r
-sudo tar -xzf project/ubuntu-base-18.04-armhf/*.tar.gz -C project/ubuntu-base-18.04-armhf/rootfs/
+mkdir -p project/rootfs/
+
+# Ubuntu Base 18.04
+# wget http://cdimage.ubuntu.com/ubuntu-base/releases/18.04/release/ubuntu-base-18.04.3-base-armhf.tar.gz -P project/rootfs/
+
+# Ubuntu Minimal 18.04: https://www.digikey.com/eewiki/display/linuxonarm/Zynq-7000#Zynq-7000-Ubuntu18.04LTS
+wget https://rcn-ee.com/rootfs/eewiki/minfs/ubuntu-18.04.1-minimal-armhf-2018-07-30.tar.xz -P project/rootfs/
+diff -s \
+    <(sha256sum project/rootfs/ubuntu-18.04.1-minimal-armhf-2018-07-30.tar.xz) \
+    <(echo "6b212ee7dd0d5c9c0af49c22cf78b63e6ad20cec641c303232fca9f21a18804c  project/rootfs/ubuntu-18.04.1-minimal-armhf-2018-07-30.tar.xz")
+
+if [ $? -ne 0 ]; then
+    echo "Rootfs image checksum mismatch!"
+    exit 1
+else
+    echo "Ensure that rootfs has chown root:root && chmod 755 permissions"
+fi

@@ -1,7 +1,7 @@
---- system-user.dtsi.orig	2019-11-04 20:19:46.135388861 -0800
-+++ system-user.dtsi	2019-11-04 20:20:18.038722373 -0800
+--- system-user.dtsi.orig	2019-11-04 21:47:12.735417727 -0800
++++ system-user.dtsi	2019-11-04 21:47:43.398751231 -0800
 @@ -6,7 +6,7 @@
- 	compatible = "digilent,zynq-zyboz7", "xlnx,zynq-7000";
+ 	compatible = "digilent,zynq-zybo", "xlnx,zynq-7000";
  
  	chosen {
 -		bootargs = "console=ttyPS0,115200 earlyprintk uio_pdrv_genirq.of_id=generic-uio";
