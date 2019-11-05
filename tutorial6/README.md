@@ -19,6 +19,7 @@ docker-env$ ./build.sh
 Partition a SD card with the following:
 
 1: primary FAT >500M bootable
+
 2: primary ext4 >3G
 
 ## Install bootloader, kernel, and rootfs
