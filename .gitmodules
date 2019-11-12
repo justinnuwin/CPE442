@@ -1,3 +1,0 @@
-[submodule "tutorial6/petalinux-docker"]
-	path = tutorial6/petalinux-docker
-	url = git@github.com:z4yx/petalinux-docker.git
