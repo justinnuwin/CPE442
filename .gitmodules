@@ -1,3 +1,6 @@
 [submodule "Ubuntu-Petalinux-Zybo"]
 	path = tutorial6_Ubuntu-Petalinux-Zybo
 	url = git@github.com:justinnuwin/Ubuntu-Petalinux-Zybo.git
+[submodule "Zybo-base-linux"]
+	path = Zybo-base-linux
+	url = https://github.com/Digilent/Zybo-base-linux.git
