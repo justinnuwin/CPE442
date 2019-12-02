@@ -1,6 +1,3 @@
 [submodule "Ubuntu-Petalinux-Zybo"]
-	path = Ubuntu-Petalinux-Zybo
-	url = git@github.com:justinnuwin/Ubuntu-Petalinux-Zybo.git
-[submodule "tutorial6"]
-	path = tutorial6
+	path = tutorial6_Ubuntu-Petalinux-Zybo
 	url = git@github.com:justinnuwin/Ubuntu-Petalinux-Zybo.git
