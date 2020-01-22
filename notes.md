@@ -73,3 +73,11 @@ Will use sobel operator to as example of algorithim to optimize
 
 To parallelize sobel exmaple program:
 - May try using threading 
+
+# 11/12
+
+Sobel Hardware Design
+
+AXI -> FIFO -> Row Memory Controller -> Multiplexer -> Summation Circuit -> Output AXI
+
+Draw detailed block diagram for Sobel IP that supports 640 width grayscale
